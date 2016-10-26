@@ -1,0 +1,17 @@
+GPU max clock rate        980 MHz
+CUDA Cores        1344
+GPU       geforce  GTX 670
+CPU       i7-4770
+CPU speed 3.4 GHz
+CPU CORES 4 fisicos + 4 virtuales
+
+Tiempo en CPU:
+
+Tiempo de cálculo: 996.240540 , tiempo total: 100393.539062
+
+Tiempos en GPU:
+1000 bloques x 1000 threads: Tiempo de cálculo: 0.035616 , tiempo total: 425.979431
+32000 bloques x 1000 threads: Tiempo de cálculo: 3.296448 , tiempo total: 423.886475
+3200 bloques x 1000 threads: Tiempo de cálculo: 0.112928 , tiempo total: 443.143555
+1000 bloques x 3200 threads: Tiempo de cálculo: 0.001696 , tiempo total: 418.922699
+10000 bloques x 10000 threads: Tiempo de cálculo: 0.001440 , tiempo total: 471.405243

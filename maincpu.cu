@@ -3,6 +3,7 @@
 #include<cmath>
 #include<opencv2/imgproc/imgproc.hpp>
 #include<opencv2/highgui/highgui.hpp>
+#include <cuda.h>
 
 using namespace cv;
 using namespace std;
@@ -14,6 +15,15 @@ int filtro[9] = {1 , 1, 1, 1, -8, 1, 1, 1, 1}; //Filtro o máscara para la suma 
 
 int main( int argc, char** argv )  {
 
+    float tiempo1, tiempo2;
+    cudaEvent_t inicio1, fin1, inicio2, fin2;
+
+    cudaEventCreate(&inicio1);
+    cudaEventCreate(&fin1);
+    cudaEventCreate(&inicio2);
+    cudaEventCreate(&fin2);
+    cudaEventRecord( inicio1, 0 );
+
     Mat src, gray, dst; //Variable Mat que guarda el src, los puntos de la imagen original, gray para transformar a grises la imagen y dst como la imagen resultado de la suma laplaceana
     src = imread( "salon.jpg" ); //Carga de la imagen
     GaussianBlur( src, src, Size(3,3), 0, 0, BORDER_DEFAULT ); /// Quitando el 'ruido' haciendo un filtro gausseano de OpenCV, esto para facilitar la detección de puntos
@@ -21,6 +31,7 @@ int main( int argc, char** argv )  {
     dst = gray.clone(); //clonar puntos para dst para que tenga el tamañao de la imagen original
     int *pedazoDeMatriz = (int *) malloc(3 * 3 * sizeof(int)); //Un arreglo que va guardar los puntos de alrededor del punto para la suma
 
+    cudaEventRecord( inicio2, 0 );
     //For para hacer la suma en todos los puntos
     for (int i = 1; i < gray.rows - 1; ++i)
         for (int j = 1; j < gray.cols - 1; ++j) {
@@ -36,10 +47,20 @@ int main( int argc, char** argv )  {
             dst.at<uchar>(i, j) = suma(pedazoDeMatriz); //Llamar función suma con la matriz, regresar y guardarla en los puntos de la imagen resultado
         }
 
+    cudaEventRecord( fin2, 0); // Se toma el tiempo final.
+    cudaEventSynchronize( fin2 ); // Se sincroniza
+    cudaEventElapsedTime( &tiempo2, inicio2, fin2 );
+
     imshow("Original", src); //carga de la imagen original
     imshow( "Resultado", dst ); //carga de la imagen resultado
     free(pedazoDeMatriz); //liberar el arreglo temporal
     waitKey(0);
+   
+    cudaEventRecord( fin1, 0); // Se toma el tiempo final.
+    cudaEventSynchronize( fin1 ); // Se sincroniza
+    cudaEventElapsedTime( &tiempo1, inicio1, fin1 );
+
+    printf("Tiempo de cálculo: %f , tiempo total: %f\n", tiempo2, tiempo1);
     return 0;
 }
 
